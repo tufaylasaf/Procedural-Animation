@@ -4,7 +4,15 @@ import math
 
 
 class Entity:
-    def __init__(self, sw, sh, radius, jointLength, color, position):
+    def __init__(
+        self,
+        sw,
+        sh,
+        radius,
+        jointLength,
+        color,
+        position,
+    ):
         self.sw = sw
         self.sh = sh
 
@@ -50,6 +58,7 @@ class Entity:
         self.position += self.velocity
         # self.wrap_around()
         self.joints[0].position = self.position
+
         self.apply_constraint()
 
         self.acceleration *= 0
@@ -79,6 +88,7 @@ class Entity:
             self.apply_force(pygame.Vector2(0, self.acceleration_amount))
 
     def draw(self, screen, skelteon=False, skin=True, outline=False):
+
         # Create a high-resolution surface
         scale_factor = (
             1  # This factor can be adjusted for performance and quality balance
@@ -95,7 +105,10 @@ class Entity:
                 pygame.draw.circle(
                     screen,
                     (255, 255, 255),
-                    (int(self.joints[i].position.x), int(self.joints[i].position.y)),
+                    (
+                        int(self.joints[i].position.x),
+                        int(self.joints[i].position.y),
+                    ),
                     self.joints[i].radius,
                     3,
                 )

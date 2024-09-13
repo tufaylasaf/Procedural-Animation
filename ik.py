@@ -8,12 +8,12 @@ LERP_FACTOR = 0.6
 
 
 class DoubleJoint:
-    def __init__(self, base, currentPos, shoulder_length, elbow_length, is_upper=True):
+    def __init__(self, base, shoulder_length, elbow_length, is_upper=True):
         self.base = base
         self.shoulder_length = shoulder_length
         self.elbow_length = elbow_length
         self.is_upper = is_upper
-        self.currentPos = base + currentPos
+        self.currentPos = base
 
         self.shoulder = base
         self.elbow = pygame.Vector2(self.shoulder.x + shoulder_length, self.shoulder.y)
@@ -40,27 +40,31 @@ class DoubleJoint:
         b = self.elbow_length
         c = total_distance
 
-        if self.is_upper:
-            new_elbow = self.ik_up(self.shoulder, self.currentPos, a, b, c)
-            hand_direction = math.atan2(
-                -(self.currentPos.y - self.shoulder.y),
-                self.currentPos.x - self.shoulder.x,
-            )
-            hand_angle = hand_direction - math.acos((b**2 + c**2 - a**2) / (2 * b * c))
-            new_hand = pygame.Vector2(
-                new_elbow.x + self.elbow_length * math.cos(hand_angle),
-                new_elbow.y - self.elbow_length * math.sin(hand_angle),
-            )
-        else:
-            new_elbow = self.ik_down(self.shoulder, self.currentPos, a, b, c)
-            hand_direction = math.atan2(
-                self.currentPos.y - self.shoulder.y, self.currentPos.x - self.shoulder.x
-            )
-            hand_angle = hand_direction - math.acos((b**2 + c**2 - a**2) / (2 * b * c))
-            new_hand = pygame.Vector2(
-                new_elbow.x + self.elbow_length * math.cos(hand_angle),
-                new_elbow.y + self.elbow_length * math.sin(hand_angle),
-            )
+        new_elbow = (
+            self.ik_up(self.shoulder, self.currentPos, a, b, c)
+            if self.is_upper
+            else self.ik_down(self.shoulder, self.currentPos, a, b, c)
+        )
+
+        hand_direction = math.atan2(
+            (
+                -(self.currentPos.y - self.shoulder.y)
+                if self.is_upper
+                else self.currentPos.y - self.shoulder.y
+            ),
+            self.currentPos.x - self.shoulder.x,
+        )
+
+        hand_angle = hand_direction - math.acos((b**2 + c**2 - a**2) / (2 * b * c))
+
+        new_hand = pygame.Vector2(
+            new_elbow.x + self.elbow_length * math.cos(hand_angle),
+            (
+                new_elbow.y - self.elbow_length * math.sin(hand_angle)
+                if self.is_upper
+                else new_elbow.y + self.elbow_length * math.sin(hand_angle)
+            ),
+        )
 
         self.elbow = self.lerp(self.elbow, new_elbow, LERP_FACTOR)
         self.hand = self.lerp(self.hand, new_hand, LERP_FACTOR)
