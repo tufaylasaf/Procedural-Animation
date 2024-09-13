@@ -16,9 +16,9 @@ class Body:
         self.detection_radius = 90
 
         # Multipliers for each rule
-        self.separation_multiplier = 1.2  # Separation has the highest priority
-        self.alignment_multiplier = 0.85  # Alignment is next
-        self.cohesion_multiplier = 1.0  # Cohesion has the lowest priority
+        self.separation_multiplier = 1.4  # Separation has the highest priority
+        self.alignment_multiplier = 0.8  # Alignment is next
+        self.cohesion_multiplier = 1.3  # Cohesion has the lowest priority
 
     def update(self, boids):
         self.neighbors = self.get_neighbors(boids, self.detection_radius)

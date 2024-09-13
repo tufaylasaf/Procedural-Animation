@@ -5,14 +5,16 @@ from Fish import Fish
 from Snake import Snake
 from Worm import Worm
 from Entity import Entity
+from Lizard import Lizard
 import random
+import colorsys
 
 pygame.init()
 
 # Constants
-WIDTH, HEIGHT = 800, 800
+WIDTH, HEIGHT = 1280, 720
 FPS = 60
-NUM_FISH = 65
+NUM_FISH = 72
 
 # Initialize screen
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -26,16 +28,24 @@ clock = pygame.time.Clock()
 radius = [16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16]
 
 
-def generate_random_shades(lightness_factor=1.0, darkness_factor=0.4):
-    # Generate a random color
-    base_color = (
-        random.randint(0, 255),
-        random.randint(0, 255),
-        random.randint(0, 255),
+def generate_random_shades(lightness_factor=1.1, darkness_factor=0.4):
+    # Generate a random base color using HSL model for better control over brightness
+    hue = random.random()  # Random hue value between 0 and 1
+    saturation = (
+        0.8 + random.random() * 0.2
+    )  # High saturation for vibrant color (0.8 to 1)
+    lightness = 0.5  # Moderate lightness for a bright color
+
+    # Convert HSL to RGB
+    base_color = tuple(
+        round(i * 255) for i in colorsys.hls_to_rgb(hue, lightness, saturation)
     )
 
     def adjust_color(c, factor):
-        return tuple(min(max(int(c * factor), 0), 255) for c in c)
+        # Adjust the lightness of the color to generate light and dark shades
+        h, l, s = colorsys.rgb_to_hls(*[x / 255.0 for x in c])
+        l = max(0, min(1, l * factor))  # Keep lightness in [0, 1] range
+        return tuple(round(i * 255) for i in colorsys.hls_to_rgb(h, l, s))
 
     # Create light and dark shades
     light_color = adjust_color(base_color, lightness_factor)
@@ -54,20 +64,20 @@ for i in range(0, NUM_FISH):
         dark_color,
         light_color,
         bodies[i].position,
-        0.4,
+        0.35,
         0.9,
     )
     fishies.append(fish)
 
-# player = Fish(
-#     WIDTH // 2,
-#     HEIGHT // 2,
-#     (54, 1, 63),
-#     (76, 2, 89),
-#     pygame.Vector2(WIDTH // 2, HEIGHT // 2),
-#     1,
-#     1,
-# )
+player = Fish(
+    WIDTH // 2,
+    HEIGHT // 2,
+    (54, 1, 63),
+    (76, 2, 89),
+    pygame.Vector2(WIDTH // 2, HEIGHT // 2),
+    0.9,
+    1,
+)
 
 # player = Worm(
 #     WIDTH // 2,
@@ -82,22 +92,60 @@ for i in range(0, NUM_FISH):
 # player = Snake(
 #     WIDTH // 2,
 #     HEIGHT // 2,
-#     20,
+#     15,
 #     16,
-#     40,
+#     34,
 #     (128, 0, 0),
 #     pygame.Vector2(WIDTH // 2, HEIGHT // 2),
 # )
 
-player = Entity(
+# player = Entity(
+#     WIDTH // 2,
+#     HEIGHT // 2,
+#     [16, 16, 16, 16, 16, 16, 16, 16],
+#     48,
+#     (0, 0, 128),
+#     pygame.Vector2(WIDTH // 2, HEIGHT // 2),
+# )
+
+player = Lizard(
     WIDTH // 2,
     HEIGHT // 2,
-    [16, 16, 16, 16, 16, 16, 16, 16],
-    48,
-    (0, 0, 128),
+    [
+        18,
+        22,
+        20,
+        18,
+        12,
+        20,
+        22,
+        25,
+        25,
+        25,
+        25,
+        25,
+        22,
+        20,
+        18,
+        14,
+        10,
+        8,
+        7,
+        6,
+        5,
+        4,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+    ],
+    10,
+    (0, 128, 0),
     pygame.Vector2(WIDTH // 2, HEIGHT // 2),
 )
-
 
 # Main game loop
 running = True
@@ -105,7 +153,6 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-
     # Handle player input
     player.handle_input()
 
@@ -120,7 +167,7 @@ while running:
     # Clear screen
     screen.fill((0, 0, 0))
 
-    player.draw(screen, skelteon=False, skin=True, outline=False)
+    player.draw(screen)
 
     # Draw player
     # for fish in fishies:

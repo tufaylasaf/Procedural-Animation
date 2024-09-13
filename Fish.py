@@ -15,18 +15,39 @@ class Fish(Entity):
         self.size = size
         self.finSize = finSize
         self.finColor = finColor
+        self.draw_state = 6  # Initial state
 
     def draw(self, screen):
-        # Adjust fin sizes and positions according to the fish size
-        self.fins(screen, 2, 64 * self.size, 25.6 * self.size, 45, 90)
-        self.fins(screen, 8, 28 * self.size, 12 * self.size, 30, 50)
-        super().draw(screen)
-        self.eyes(screen)
-        self.dorsal_fin(screen)
+        # Toggle drawing based on state
+        if self.draw_state == 0:
+            super().draw(screen, skelteon=True, skin=False, outline=False)
+        elif self.draw_state == 1:
+            super().draw(screen, skelteon=True, skin=False, outline=True)
+        elif self.draw_state == 2:
+            super().draw(screen, skelteon=False, skin=True, outline=False)
+        elif self.draw_state == 3:
+            super().draw(screen, skelteon=False, skin=True, outline=False)
+            self.eyes(screen)
+        elif self.draw_state == 4:
+            self.fins(screen, 2, 64 * self.size, 25.6 * self.size, 45, 90)
+            super().draw(screen, skelteon=False, skin=True, outline=False)
+            self.eyes(screen)
+        elif self.draw_state == 5:
+            self.fins(screen, 2, 64 * self.size, 25.6 * self.size, 45, 90)
+            self.fins(screen, 8, 28 * self.size, 12 * self.size, 30, 50)
+            super().draw(screen, skelteon=False, skin=True, outline=False)
+            self.eyes(screen)
+        elif self.draw_state == 6:
+            self.fins(screen, 2, 64 * self.size, 25.6 * self.size, 45, 90)
+            self.fins(screen, 8, 28 * self.size, 12 * self.size, 30, 50)
+            super().draw(screen, skelteon=False, skin=True, outline=False)
+            self.eyes(screen)
+            # Adjust fin sizes and positions according to the fish size
+            self.dorsal_fin(screen)
 
     def eyes(self, screen):
         # Scale eye size based on fish size
-        eye_radius = 5 * self.size
+        eye_radius = 6 * self.size
         a, b = self.joints[0].get_points(self.joints[1], 0.65)
         pygame.draw.circle(screen, (255, 255, 255), a, eye_radius)
         pygame.draw.circle(screen, (255, 255, 255), b, eye_radius)
@@ -91,3 +112,6 @@ class Fish(Entity):
         # Draw the dorsal fin using bezier curve approximation
         pygame.draw.polygon(screen, self.finColor, dorsal_points)
         pygame.draw.polygon(screen, (255, 255, 255), dorsal_points, 1)
+
+    def toggle_draw_state(self):
+        self.draw_state = (self.draw_state + 1) % 7  # Cycle through states

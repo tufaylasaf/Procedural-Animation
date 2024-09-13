@@ -22,8 +22,8 @@ class Entity:
         self.velocity = pygame.Vector2(0, 0)
         self.acceleration = pygame.Vector2(0, 0)
         self.radius = radius
-        self.max_speed = 7
-        self.acceleration_amount = 0.7
+        self.max_speed = 12
+        self.acceleration_amount = 0.35
         self.friction = 0.1
         self.time = 0
 
@@ -33,12 +33,14 @@ class Entity:
         self.time += 0.03  # Increment time
         self.a = 300
 
-        # Parametric equations for infinity shape (lemniscate of Bernoulli)
-        t = self.time
-        x = self.a * math.cos(t) / (1 + math.sin(t) ** 2)
-        y = self.a * math.cos(t) * math.sin(t) / (1 + math.sin(t) ** 2)
+        # # Parametric equations for infinity shape (lemniscate of Bernoulli)
+        # t = self.time
+        # x = (
+        #     self.a * math.cos(t) * math.sin(t) / (1 + math.sin(t) ** 2)
+        # )  # Swap x and y calculations
+        # y = self.a * math.cos(t) / (1 + math.sin(t) ** 2)
 
-        self.position = pygame.Vector2(x + self.sw, y + self.sh)
+        # self.position = pygame.Vector2(x + self.sw, y + self.sh)
 
         if self.velocity.length() > self.max_speed:
             self.velocity.scale_to_length(self.max_speed)
@@ -79,7 +81,7 @@ class Entity:
     def draw(self, screen, skelteon=False, skin=True, outline=False):
         # Create a high-resolution surface
         scale_factor = (
-            2  # This factor can be adjusted for performance and quality balance
+            1  # This factor can be adjusted for performance and quality balance
         )
         high_res_surface = pygame.Surface(
             (screen.get_width() * scale_factor, screen.get_height() * scale_factor),
@@ -137,7 +139,7 @@ class Entity:
                     high_res_surface,
                     (255, 0, 0),
                     (point),
-                    6,
+                    3,
                 )
 
         if skin:
@@ -180,18 +182,6 @@ class Joint:
         self.radius = radius
 
     def get_points(self, next, offset=1):
-        # diff = self.position - next.position
-        # angle = math.radians(diff.angle_to(pygame.Vector2(1, 0)))
-        # # angle = 0
-        # a = pygame.Vector2(
-        #     (self.radius * math.cos((math.pi / 2) + angle)) + self.position.x,
-        #     self.radius * math.sin((math.pi / 2) + angle) + self.position.y,
-        # )
-        # b = pygame.Vector2(
-        #     (self.radius * math.cos(-(math.pi / 2) + angle)) + self.position.x,
-        #     self.radius * math.sin(-(math.pi / 2) + angle) + self.position.y,
-        # )
-        # return a, b
         direction = next.position - self.position
         direction = direction.normalize()
 
